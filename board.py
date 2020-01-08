@@ -5,9 +5,6 @@ class Board:
         self.board = [[None for _ in range(8)] for _ in range(8)]
         self.pieces = []
 
-    def __getitem__(self, key):
-        return self.board[key]
-
     def __str__(self):
         return '\n'.join(' '.join([str(p) if p is not None else '_' for p in r]) for r in self.board)
 

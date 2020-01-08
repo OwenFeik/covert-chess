@@ -1,6 +1,6 @@
 # Note:
 # because I'm an idiot, the chess piece coordinates
-# work as follows. Each piece takes it's own starting
+# work as follows; Each piece takes it's own starting
 # side as the zero of a y axis, while they share x
 # values. White (True) has the actual coordinates
 # while black coordinates need to be adapted by
