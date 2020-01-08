@@ -15,6 +15,7 @@ class Piece:
         self.colour = colour
 
         self.checkable = False
+        self.piece_name = 'piece'
 
         self.init()
 
@@ -25,6 +26,21 @@ class Piece:
     def c(self):
         return self.colour
 
+    @property
+    def sprite_name(self):
+        return ('white' if self.colour else 'black') + '_' + self.piece_name
+
+    @property
+    def pos(self):
+        return (self.x, self.y) if self.colour else (self.x, (7 - self.y))
+
+    @property
+    def draw_pos(self):
+        # Returns the position of the piece relative
+        # to the top left rather than the bottom right.
+
+        return (self.x, (7 - self.y)) if self.colour else (self.x, self.y)
+
     def visible(self):
         # Tiles on the board that this piece can see
         # Default of all adjacent tiles (Pawn)
@@ -34,9 +50,12 @@ class Piece:
             for y in range(3):
                 tiles.append((self.x + x - 1, self.y + y - 1))
 
+        # If black piece, flip in the y
         if self.c == False:
             tiles = [(t[0], (7 - t[1])) for t in tiles]
-        tiles = [t for t in tiles if 0 <= t[0] < 8 and 0 <= t[1] < 8] # Only tiles that are actually on the board
+
+        # Only tiles that are actually on the board
+        tiles = [t for t in tiles if 0 <= t[0] < 8 and 0 <= t[1] < 8] 
 
         return tiles
 
@@ -58,6 +77,7 @@ class Piece:
 class Pawn(Piece):
     def init(self):
         self.moved = False
+        self.piece_name = 'pawn'
 
     def __str__(self):
         return 'P' + ('W' if self.c else 'B')

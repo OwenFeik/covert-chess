@@ -6,7 +6,7 @@ import board
 
 b = board.Board().set_up()
 d = display.Display()
-d.redraw(b, False)
+d.redraw(b, True)
 
 while True:
     for event in pygame.event.get():

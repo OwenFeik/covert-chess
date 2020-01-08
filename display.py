@@ -13,10 +13,11 @@ class Display():
         self.screen = pygame.display.set_mode(size)
         self.surface = pygame.Surface((self.board_size, self.board_size)).convert()
         self.colours = loaders.get_colours()
+        self.sprites = loaders.Spritesheet.get_pieces(int(self.tile_size * 0.8))
 
     def redraw(self, board, colour = True):
         self.draw_board()
-        self.colour_visible_tiles(board, colour)
+        self.draw_visible_tiles(board, colour)
 
         l = (self.width - self.board_size) // 2
         t = (self.height - self.board_size) // 2
@@ -35,17 +36,18 @@ class Display():
                 self.surface.fill(self.colours['board_hidden_white'], (x * ts * 2, y * ts * 2, ts, ts))
                 self.surface.fill(self.colours['board_hidden_white'], ((x + 0.5) * ts * 2, (y + 0.5) * ts * 2, ts, ts))
 
-    def colour_visible_tiles(self, board, colour):
-        tiles = []
+    def draw_visible_tiles(self, board, colour):
+        visible = []
         for piece in board.pieces:
             if piece.colour == colour:
-                tiles.extend(piece.visible())
-        tiles = list(set(tiles))
+                visible.extend(piece.visible())
+        visible = list(set(visible))
         
         ts = self.tile_size
-        for tile in tiles:
+        for tile in visible:
             x, y = tile
             # x % 2 == y % 2 for white tiles on a chess board.
+            # flipped because we number from 0 not 1
             if x % 2 == y % 2:
                 colour = self.colours['board_visible_black']
             else:
@@ -53,3 +55,8 @@ class Display():
 
             # (7 - y) because piece pos is given from BL rather than TR
             self.surface.fill(colour, (x * ts, (7 - y) * ts, ts, ts))
+
+        for piece in board.pieces:
+            if piece.pos in visible:
+                x, y = piece.draw_pos
+                self.surface.blit(self.sprites[piece.sprite_name], ((x * self.tile_size) + self.tile_size * 0.1, y * self.tile_size + self.tile_size * 0.1))

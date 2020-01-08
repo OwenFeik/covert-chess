@@ -14,25 +14,24 @@ def get_config(setting = None):
 
 # Adapted from https://www.pygame.org/wiki/Spritesheet
 class Spritesheet():
-    def __init__(self, filename, scalefactor = 1):
+    def __init__(self, filename, size):
         try:
-            self.sheet = pygame.image.load(filename).convert()
+            self.sheet = pygame.image.load(filename).convert_alpha()
         except pygame.error:
             print('Unable to load spritesheet image:', filename)
             raise SystemExit
 
-        self.scalefactor = scalefactor
+        self.size = size
 
     # Load a specific image from a specific rectangle
     def image_at(self, rectangle):
         "Loads image from x,y,x+offset,y+offset"
-        rect = pygame.Rect(rectangle)
-        image = pygame.Surface(rect.size).convert()
-        image.blit(self.sheet, (0, 0), rect)
 
-        if self.scalefactor > 1:
-            w, h = image.get_size()
-            image = pygame.transform.scale(image, (w * self.scalefactor, h * self.scalefactor))
+        rect = pygame.Rect(rectangle)
+        image = pygame.Surface(rect.size).convert_alpha()
+        image.fill((0, 0, 0, 0))
+        image.blit(self.sheet, (0, 0), rect)
+        image = pygame.transform.scale(image, (self.size, self.size))
 
         return image
     
@@ -49,9 +48,26 @@ class Spritesheet():
         return self.images_at(tups)
 
     @staticmethod
-    def get_pieces():
+    def get_pieces(size = 64):
         file = get_config('spritesheet')
-        return Spritesheet(file, 4).load_strip((0, 0, 16, 16), 12)
+        pieces = Spritesheet(file, size).load_strip((0, 0, 16, 16), 12)
+        
+        names = [
+            'black_pawn',
+            'black_castle',
+            'black_knight',
+            'black_bishop',
+            'black_queen',
+            'black_king',
+            'white_pawn',
+            'white_castle',
+            'white_knight',
+            'white_bishop',
+            'white_queen',
+            'white_king'
+        ]
+
+        return {names[i]: pieces[i] for i in range(len(names))}
 
 def get_colours():
     with open(get_config('colours'), 'r') as f:
