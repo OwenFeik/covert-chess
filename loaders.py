@@ -54,13 +54,13 @@ class Spritesheet():
         
         names = [
             'black_pawn',
-            'black_castle',
+            'black_rook',
             'black_knight',
             'black_bishop',
             'black_queen',
             'black_king',
             'white_pawn',
-            'white_castle',
+            'white_rook',
             'white_knight',
             'white_bishop',
             'white_queen',

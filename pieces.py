@@ -15,12 +15,18 @@ class Piece:
         self.colour = colour
 
         self.checkable = False
+        self.moved = False
         self.piece_name = 'piece'
 
         self.init()
 
+    def init(self):
+        # Set up anything necessary about the piece
+        # e.g. the king is checkable, pawn double move
+        pass
+
     def __str__(self):
-        return 'G'
+        return ('White ' if self.c else 'Black ') + self.piece_name.capitalize()
 
     @property
     def c(self):
@@ -41,6 +47,22 @@ class Piece:
 
         return (self.x, (7 - self.y)) if self.colour else (self.x, self.y)
 
+    def get_context(self, board):
+        # Black pieces deal with the board from the opposite
+        # perspective of white pieces.
+
+        b = board.board
+        if self.colour == False:
+            b = [list(reversed(column)) for column in b]
+        return b
+
+    def remove_context(self, tiles):
+        if self.colour == False:
+            # Because the board is flipped on black, fix moves
+            return [(tile[0], 7 - tile[1]) for tile in tiles]
+        else:
+            return tiles
+
     def visible(self):
         # Tiles on the board that this piece can see
         # Default of all adjacent tiles (Pawn)
@@ -50,45 +72,31 @@ class Piece:
             for y in range(3):
                 tiles.append((self.x + x - 1, self.y + y - 1))
 
-        # If black piece, flip in the y
-        if self.c == False:
-            tiles = [(t[0], (7 - t[1])) for t in tiles]
-
         # Only tiles that are actually on the board
-        tiles = [t for t in tiles if 0 <= t[0] < 8 and 0 <= t[1] < 8] 
+        tiles = [t for t in self.remove_context(tiles) if 0 <= t[0] < 8 and 0 <= t[1] < 8] 
 
         return tiles
-
-    def init(self):
-        # Set up anything necessary about the piece
-        # e.g. the king is checkable, pawn double move
-        pass
 
     def moves(self, board):
         # Return a list of possible moves for this
         # piece, based on the current boardstate
+        return self.remove_context(self._moves(self.get_context(board)))
+
+    def _moves(self, board):
+        # moves() sets up the board to be processed
+        # by this function, and cleans this functions outputs
         pass
 
     def move(self):
         # Resolve any actions necessary after a
         # move of this piece, e.g. pawn replacement
-        pass
+        self.moved = True
 
 class Pawn(Piece):
     def init(self):
-        self.moved = False
         self.piece_name = 'pawn'
 
-    def __str__(self):
-        return 'P' + ('W' if self.c else 'B')
-
-    def moves(self, board):
-        board = board.board
-
-        # To do moves for black, simply flip the board
-        if self.c == False:
-            board = list(reversed(board))
-        
+    def _moves(self, board):
         moves = []
 
         if board[self.x][self.y + 1] == None:
@@ -107,11 +115,12 @@ class Pawn(Piece):
             if tile != None and tile.c != self.c:
                 moves.append((self.x + 1, self.y + 1))
 
-        if self.c == False:
-            # Because the board is flipped on black, fix moves
-            return [(m[0], 7 - m[1]) for m in moves]
-        else:
-            return moves
+        return moves
 
-    def move(self):
-        self.moved = True
+class Rook(Piece):
+    def init(self):
+        self.piece_name = 'rook'
+
+    def moves(self, board):
+        b = board.board
+

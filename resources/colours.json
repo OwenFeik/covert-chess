@@ -1,8 +1,8 @@
 {
-    "board_visible_white": [ 200, 200, 200 ],
-    "board_visible_black": [ 100, 100, 100 ],
-    "board_hidden_white": [ 255, 255, 255 ],
-    "board_hidden_black": [ 0, 0, 0 ],
-    "board_green_overlay": [ 0, 255, 0 ],
-    "board_blue_overlay": [0, 0, 255]
+    "board_visible_white": [150, 150, 150],
+    "board_visible_black": [50, 50, 50],
+    "board_hidden_white": [255, 255, 255],
+    "board_hidden_black": [0, 0, 0],
+    "board_possible_moves": [0, 255, 0],
+    "board_active_piece": [0, 0, 255]
 }

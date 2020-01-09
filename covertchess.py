@@ -5,9 +5,12 @@ import display
 import board
 from pieces import Pawn
 
+player = False
+
 b = board.Board().set_up()
+b.add(Pawn(3, 5, True))
 d = display.Display(b)
-d.redraw(True)
+d.redraw(player)
 
 game_running = True
 redraw = False
@@ -21,7 +24,8 @@ while game_running:
             x, y = event.pos
             d.handle_click(x, y)
             redraw = True
-    d.redraw(True)
-    redraw = False
+    if redraw:
+        d.redraw(player)
+        redraw = False
 
 pygame.quit()

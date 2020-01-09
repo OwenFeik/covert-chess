@@ -46,10 +46,9 @@ class Display():
         visible = []
         for piece in self.board.pieces:
             if piece.colour == colour:
-                visible.extend(piece.visible())
+                visible.extend([(x, (7 - y)) for x, y in piece.visible()])
         visible = list(set(visible))
         
-        ts = self.tile_size
         for tile in visible:
             x, y = tile
             # x % 2 == y % 2 for white tiles on a chess board.
@@ -59,18 +58,17 @@ class Display():
             else:
                 colour = self.colours['board_visible_white']
 
-            # (7 - y) because piece pos is given from BL rather than TR
-            self.fill_tile(colour, x, (7 - y))
+            self.fill_tile(colour, x, y)
 
         if self.active_piece:
             for move in self.active_piece.moves(self.board):
                 x, y = move
-                self.fill_tile('board_green_overlay', x, (7 - y), 128)
+                self.fill_tile('board_possible_moves', x, (7 - y), 128)
             x, y = self.active_piece.draw_pos
-            self.fill_tile('board_blue_overlay', x, y, 128)
+            self.fill_tile('board_active_piece', x, y, 128)
 
         for piece in self.board.pieces:
-            if piece.pos in visible:
+            if piece.draw_pos in visible:
                 x, y = piece.draw_pos
                 self.surface.blit(self.sprites[piece.sprite_name], ((x * self.tile_size) + self.tile_size * 0.1, y * self.tile_size + self.tile_size * 0.1))
 
