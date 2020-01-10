@@ -87,15 +87,26 @@ class Piece:
         # by this function, and cleans this functions outputs
         pass
 
-    def move(self, x, y):
-        # Resolve any actions necessary after a
-        # move of this piece, e.g. pawn replacement
-        self.moved = True
-        self.x = x
+    def move(self, board, x, y):
+        new_x, new_y = self._move(board, x, y)
+
+        self.x = new_x
         if self.c:
-            self.y = y
+            self.y = new_y
         else:
-            self.y = (7 - y)
+            self.y = (7 - new_y)
+        self.moved = True
+
+    def _move(self, board, x, y):
+        target_piece = board.board[x][y]
+        if target_piece:
+            board.captured.append(target_piece)
+            board.pieces.remove(target_piece)
+        old_x, old_y = self.pos
+        board.board[old_x][old_y] = None
+        board.board[x][y] = self
+
+        return (x, y)
 
     def can_move_to(self, board, x, y):
         return (x, y) in self.moves(board)
@@ -132,10 +143,67 @@ class Pawn(Piece):
 
         return moves
 
+
+
 class Rook(Piece):
     def init(self):
         self.piece_name = 'rook'
 
-    def moves(self, board):
-        b = board.board
+    def _moves(self, board):
+        moves = []
 
+        for x in range(self.x + 1, 8):
+            if board[x][self.y] and board[x][self.y].c == self.c:
+                break
+            else:
+                moves.append((x, self.y))
+
+        for x in range(self.x - 1, -1, -1):
+            if board[x][self.y] and board[x][self.y].c == self.c:
+                break
+            else:
+                moves.append((x, self.y))
+
+        for y in range(self.y + 1, 8):
+            if board[self.x][y] and board[self.x][y].c == self.c:
+                break
+            else:
+                moves.append((self.x, y))
+
+        for y in range(self.y - 1, -1, -1):
+            if board[self.x][y] and board[self.x][y].c == self.c:
+                break
+            else:
+                moves.append((self.x, y))
+
+        return moves
+
+    def _move(self, board, x, y):
+        old_x, old_y = self.pos
+        
+        if x != self.x:
+            offset = 1 if old_x < x else -1
+
+            for _x in range(old_x + offset, x + offset, offset):
+                if board.board[_x][old_y]:
+                    break
+            else:
+                _x = x
+            _y = old_y
+        elif y != self.y:
+            offset = 1 if old_y < y else -1
+            for _y in range(old_y + offset, y + offset, offset):
+                if board.board[old_x][_y]:
+                    break
+            else:
+                _y = y
+            _x = old_x
+
+        target_piece = board.board[_x][_y]
+        if target_piece:
+            board.captured.append(target_piece)
+            board.pieces.remove(target_piece)
+        board.board[old_x][old_y] = None
+        board.board[_x][_y] = self
+
+        return (_x, _y)

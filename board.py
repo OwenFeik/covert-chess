@@ -11,10 +11,23 @@ class Board:
     def __str__(self):
         return '\n'.join(' '.join([str(p) if p is not None else '_' for p in r]) for r in self.board)
 
+    def visible(self, colour):
+        visible = []
+        for piece in self.pieces:
+            if piece.colour == colour:
+                visible.extend(piece.visible())
+        visible = list(set(visible))
+
+        return visible
+
     def set_up(self):
-        for i in range(8):
-            self.add(pieces.Pawn(i, 1, True))
-            self.add(pieces.Pawn(i, 1, False))
+        for x in range(8):
+            self.add(pieces.Pawn(x, 1, True))
+            self.add(pieces.Pawn(x, 1, False))
+
+        for x in [0, 7]:
+            self.add(pieces.Rook(x, 0, False))
+            self.add(pieces.Rook(x, 0, True))
 
         return self
 
@@ -40,7 +53,7 @@ class Board:
 
     def handle_click(self, x, y):
         if self.active_piece and self.active_piece.can_move_to(self, x, y):
-            self.move(self.active_piece, x, y)
+            self.active_piece.move(self, x, y)
             self.active_piece = None
         elif self.board[x][y]:
             if self.board[x][y].colour == self.player:

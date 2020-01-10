@@ -42,12 +42,8 @@ class Display():
                 self.fill_tile('board_hidden_white', (x * 2) + 1, (y * 2) + 1)
 
     def draw_visible_tiles(self, colour):
-        visible = []
-        for piece in self.board.pieces:
-            if piece.colour == colour:
-                visible.extend([(x, (7 - y)) for x, y in piece.visible()])
-        visible = list(set(visible))
-        
+        visible = [(x, (7 - y)) for x, y in self.board.visible(colour)]
+
         for tile in visible:
             x, y = tile
             # x % 2 == y % 2 for white tiles on a chess board.

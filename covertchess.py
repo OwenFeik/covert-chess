@@ -3,12 +3,10 @@ with contextlib.redirect_stdout(None):
     import pygame
 import display
 import board
-from pieces import Pawn
 
 player = False
 
 b = board.Board(player).set_up()
-b.add(Pawn(3, 5, True))
 d = display.Display(b)
 d.redraw(player)
 
