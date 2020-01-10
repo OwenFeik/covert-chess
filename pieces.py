@@ -87,10 +87,18 @@ class Piece:
         # by this function, and cleans this functions outputs
         pass
 
-    def move(self):
+    def move(self, x, y):
         # Resolve any actions necessary after a
         # move of this piece, e.g. pawn replacement
         self.moved = True
+        self.x = x
+        if self.c:
+            self.y = y
+        else:
+            self.y = (7 - y)
+
+    def can_move_to(self, board, x, y):
+        return (x, y) in self.moves(board)
 
 class Pawn(Piece):
     def init(self):
@@ -99,17 +107,24 @@ class Pawn(Piece):
     def _moves(self, board):
         moves = []
 
+        # A pawn can't move if it's in the final tile (should have upgraded)
+        if self.y == 7:
+            return moves
+
+        # Forward
         if board[self.x][self.y + 1] == None:
             moves.append((self.x, self.y + 1))
 
             if not self.moved and board[self.x][self.y + 2] == None:
                 moves.append((self.x, self.y + 2))
 
+        # Forward-left
         if 1 < self.x: 
             tile = board[self.x - 1][self.y + 1]
             if tile != None and tile.c != self.c:
                 moves.append((self.x - 1, self.y + 1))
         
+        # Forward-right
         if 7 > self.x:
             tile = board[self.x + 1][self.y + 1]
             if tile != None and tile.c != self.c:

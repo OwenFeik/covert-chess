@@ -7,7 +7,6 @@ class Display():
         pygame.display.set_caption('chess')
 
         self.board = board
-        self.active_piece = None
 
         self.size = size
         self.width, self.height = size
@@ -60,11 +59,11 @@ class Display():
 
             self.fill_tile(colour, x, y)
 
-        if self.active_piece:
-            for move in self.active_piece.moves(self.board):
+        if self.board.active_piece:
+            for move in self.board.active_piece.moves(self.board):
                 x, y = move
                 self.fill_tile('board_possible_moves', x, (7 - y), 128)
-            x, y = self.active_piece.draw_pos
+            x, y = self.board.active_piece.draw_pos
             self.fill_tile('board_active_piece', x, y, 128)
 
         for piece in self.board.pieces:
@@ -89,6 +88,4 @@ class Display():
 
     def handle_click(self, x, y):
         tile = (x - self.x_border_size) // self.tile_size, (y - self.y_border_size) // self.tile_size
-        for piece in self.board.pieces:
-            if piece.draw_pos == tile:
-                self.active_piece = piece
+        self.board.handle_click(tile[0], (7 - tile[1]))
