@@ -32,8 +32,6 @@ class Display():
         pygame.display.update()
 
     def draw_board(self):
-        ts = self.tile_size
-
         # Fill board black then draw white tiles
         self.surface.fill(self.colours['board_hidden_black'])
         for x in range(4):
@@ -47,11 +45,10 @@ class Display():
         for tile in visible:
             x, y = tile
             # x % 2 == y % 2 for white tiles on a chess board.
-            # flipped because we number from 0 not 1
             if x % 2 == y % 2:
-                colour = self.colours['board_visible_black']
-            else:
                 colour = self.colours['board_visible_white']
+            else:
+                colour = self.colours['board_visible_black']
 
             self.fill_tile(colour, x, y)
 

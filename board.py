@@ -26,8 +26,16 @@ class Board:
             self.add(pieces.Pawn(x, 1, False))
 
         for x in [0, 7]:
-            self.add(pieces.Rook(x, 0, False))
             self.add(pieces.Rook(x, 0, True))
+            self.add(pieces.Rook(x, 0, False))
+
+        for x in [1, 6]:
+            self.add(pieces.Knight(x, 0, True))
+            self.add(pieces.Knight(x, 0, False))
+
+        for x in [2, 5]:
+            self.add(pieces.Bishop(x, 0 ,True))
+            self.add(pieces.Bishop(x, 0, False))
 
         return self
 

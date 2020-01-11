@@ -12,6 +12,8 @@ class Piece:
     def __init__(self, x, y, colour):
         self.x = x
         self.y = y
+
+        # True for white, False for black
         self.colour = colour
 
         self.checkable = False
@@ -143,8 +145,6 @@ class Pawn(Piece):
 
         return moves
 
-
-
 class Rook(Piece):
     def init(self):
         self.piece_name = 'rook'
@@ -198,6 +198,91 @@ class Rook(Piece):
             else:
                 _y = y
             _x = old_x
+
+        target_piece = board.board[_x][_y]
+        if target_piece:
+            board.captured.append(target_piece)
+            board.pieces.remove(target_piece)
+        board.board[old_x][old_y] = None
+        board.board[_x][_y] = self
+
+        return (_x, _y)
+
+class Knight(Piece):
+    def init(self):
+        self.piece_name = 'knight'
+
+    def _moves(self, board):
+        moves = []
+        x, y = self.pos
+
+        for i in range(1, 3):
+            moves.append((x + i, y + (3 - i))) # TR moves
+            moves.append((x + (3 - i), y - i))
+            moves.append((x - i, y - (3 - i)))
+            moves.append((x - (3 - i), y + i))
+
+        moves = [m for m in self.remove_context(moves) if 0 <= m[0] < 8 and 0 <= m[1] < 8]
+        moves = [m for m in moves if (not board[m[0]][m[1]]) or (not board[m[0]][m[1]].c == self.c)]
+
+        return moves
+
+class Bishop(Piece):
+    def init(self):
+        self.piece_name = 'bishop'
+
+    def _moves(self, board):
+        moves = []
+        x, y = self.x, self.y
+
+        # TR for white, BR for black
+        for i in range(1, min(7 - x, 7 - y) + 1):
+            if board[x + i][y + i] and board[x + i][y + i].c == self.c:
+                break
+            else:
+                moves.append((x + i, y + i))
+
+        # TL for white, BL for black
+        for i in range(1, min(x, 7 - y) + 1):
+            if board[x - i][y + i] and board[x - i][y + i].c == self.c:
+                break
+            else:
+                moves.append((x - i, y + i))
+
+        # BL for white, TL for black
+        for i in range(1, min(x, y) + 1):
+            if board[x - i][y - i] and board[x - i][y - i].c == self.c:
+                break
+            else:
+                moves.append((x - i, y - i))
+
+        # BR for white, TR for black
+        for i in range(1, min(7 - x, y) + 1):
+            if board[x + i][y - i] and board[x + i][y - i].c == self.c:
+                break
+            else:
+                moves.append((x + i, y - i))
+
+        return moves
+
+    def _move(self, board, x, y):
+        old_x, old_y = self.pos
+
+        x_dir = 1 if old_x < x else -1
+        y_dir = 1 if old_y < y else -1
+        
+        in_range_x = lambda i: (x_dir > 0  and (0 <= i < x)) or (x_dir < 0 and (x < i < 8)) 
+        in_range_y = lambda i: (y_dir > 0  and (0 <= i < y)) or (y_dir < 0 and (y < i < 8))
+
+        _x, _y = old_x, old_y
+        while in_range_x(_x) and in_range_y(_y):
+            _x += x_dir
+            _y += y_dir
+
+            if board.board[_x][_y]:
+                break
+        else:
+            _x, _y = x, y
 
         target_piece = board.board[_x][_y]
         if target_piece:

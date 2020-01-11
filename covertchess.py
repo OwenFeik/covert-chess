@@ -4,7 +4,7 @@ with contextlib.redirect_stdout(None):
 import display
 import board
 
-player = False
+player = True
 
 b = board.Board(player).set_up()
 d = display.Display(b)
