@@ -4,5 +4,6 @@
     "board_hidden_white": [255, 255, 255],
     "board_hidden_black": [0, 0, 0],
     "board_possible_moves": [0, 255, 0],
-    "board_active_piece": [0, 0, 255]
+    "board_active_piece": [0, 0, 255],
+    "board_checked": [255, 0, 0]
 }

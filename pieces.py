@@ -16,7 +16,6 @@ class Piece:
         # True for white, False for black
         self.colour = colour
 
-        self.checkable = False
         self.moved = False
         self.piece_name = 'piece'
 
@@ -109,6 +108,7 @@ class Piece:
         if target_piece:
             board.captured.append(target_piece)
             board.pieces.remove(target_piece)
+
         old_x, old_y = self.pos
         board.board[old_x][old_y] = None
         board.board[x][y] = self
@@ -346,7 +346,21 @@ class Queen(Piece):
 class King(Piece):
     def init(self):
         self.piece_name = 'king'
-        self.checkable = True
 
     def _moves(self, board, visible):
-        pass
+        moves = []
+
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                if not (0 <= self.x + x < 8):
+                    continue
+                elif self.c and not (0 < self.y + y <= 8):
+                    continue
+                elif not (0 < 7 - (self.y + y) <= 8):
+                    continue
+                elif board[x + self.x][y + self.y] and board[x + self.x][y + self.y].c == self.c:
+                    continue
+
+                moves.append((self.x + x, self.y + y))
+
+        return moves

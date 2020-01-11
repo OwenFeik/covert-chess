@@ -39,8 +39,8 @@ class Display():
                 self.fill_tile('board_hidden_white', x * 2, y * 2)
                 self.fill_tile('board_hidden_white', (x * 2) + 1, (y * 2) + 1)
 
-    def draw_visible_tiles(self, colour):
-        visible = [(x, (7 - y)) for x, y in self.board.visible(colour)]
+    def draw_visible_tiles(self, player):
+        visible = [(x, (7 - y)) for x, y in self.board.visible(player)]
 
         for tile in visible:
             x, y = tile
@@ -58,6 +58,11 @@ class Display():
                 self.fill_tile('board_possible_moves', x, (7 - y), 128)
             x, y = self.board.active_piece.draw_pos
             self.fill_tile('board_active_piece', x, y, 128)
+
+        king = self.board.checked(player)
+        if king:
+            x, y = king.draw_pos
+            self.fill_tile('board_checked', x, y, 128)
 
         for piece in self.board.pieces:
             if piece.draw_pos in visible:
@@ -81,5 +86,5 @@ class Display():
 
     def handle_click(self, x, y):
         tile = (x - self.x_border_size) // self.tile_size, (y - self.y_border_size) // self.tile_size
-        if 0 <= tile[0] < 8 and 0 <= tile[0] < 8:
+        if 0 <= tile[0] < 8 and 0 <= tile[1] < 8:
             self.board.handle_click(tile[0], (7 - tile[1]))
