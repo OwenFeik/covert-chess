@@ -81,4 +81,5 @@ class Display():
 
     def handle_click(self, x, y):
         tile = (x - self.x_border_size) // self.tile_size, (y - self.y_border_size) // self.tile_size
-        self.board.handle_click(tile[0], (7 - tile[1]))
+        if 0 <= tile[0] < 8 and 0 <= tile[0] < 8:
+            self.board.handle_click(tile[0], (7 - tile[1]))

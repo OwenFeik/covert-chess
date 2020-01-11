@@ -37,6 +37,9 @@ class Board:
             self.add(pieces.Bishop(x, 0 ,True))
             self.add(pieces.Bishop(x, 0, False))
 
+        self.add(pieces.Queen(4, 0, True))
+        self.add(pieces.Queen(4, 0, False))
+
         return self
 
     def place(self, piece):
@@ -48,16 +51,6 @@ class Board:
     def add(self, piece):
         self.pieces.append(piece)
         self.place(piece)
-
-    def move(self, piece, x, y):
-        target_piece = self.board[x][y]
-        if target_piece:
-            self.captured.append(target_piece)
-            self.pieces.remove(target_piece)
-        old_x, old_y = piece.pos
-        self.board[old_x][old_y] = None
-        self.board[x][y] = piece
-        piece.move(x, y)
 
     def handle_click(self, x, y):
         if self.active_piece and self.active_piece.can_move_to(self, x, y):

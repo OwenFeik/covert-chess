@@ -314,3 +314,39 @@ class Bishop(Piece):
         board.board[_x][_y] = self
 
         return (_x, _y)
+
+class Queen(Piece):
+    def init(self):
+        self.piece_name = 'queen'
+        self.rook = Rook(self.x, self.y, self.colour)
+        self.rook.moved = True # prevent castling
+        self.bishop = Bishop(self.x, self.y, self.colour)
+
+    def _moves(self, board, visible):
+        moves = self.rook._moves(board, visible)
+        moves.extend(self.bishop._moves(board, visible))
+
+        return moves
+
+    def _move(self, board, x, y):
+        old_x, old_y = self.pos
+        if old_x != x and old_y != y:
+            self.bishop.move(board, x, y)
+            new_x, new_y = self.bishop.pos
+            board.board[new_x][new_y] = self
+            self.rook.x, self.rook.y = self.bishop.x, self.bishop.y
+            return new_x, new_y
+        else:
+            self.rook.move(board, x, y)
+            new_x, new_y = self.rook.pos
+            board.board[new_x][new_y] = self
+            self.bishop.x, self.bishop.y = self.rook.x, self.rook.y
+            return new_x, new_y
+
+class King(Piece):
+    def init(self):
+        self.piece_name = 'king'
+        self.checkable = True
+
+    def _moves(self, board, visible):
+        pass
