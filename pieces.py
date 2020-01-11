@@ -56,7 +56,12 @@ class Piece:
         b = board.board
         if self.colour == False:
             b = [list(reversed(column)) for column in b]
-        return b
+
+        v = board.visible(self.c)
+        if self.colour == False:
+            v = [(t[0], (7 - t[1])) for t in v]
+
+        return b, v
 
     def remove_context(self, tiles):
         if self.colour == False:
@@ -82,9 +87,9 @@ class Piece:
     def moves(self, board):
         # Return a list of possible moves for this
         # piece, based on the current boardstate
-        return self.remove_context(self._moves(self.get_context(board)))
+        return self.remove_context(self._moves(*self.get_context(board)))
 
-    def _moves(self, board):
+    def _moves(self, board, visible):
         # moves() sets up the board to be processed
         # by this function, and cleans this functions outputs
         pass
@@ -117,7 +122,7 @@ class Pawn(Piece):
     def init(self):
         self.piece_name = 'pawn'
 
-    def _moves(self, board):
+    def _moves(self, board, visible):
         moves = []
 
         # A pawn can't move if it's in the final tile (should have upgraded)
@@ -149,29 +154,37 @@ class Rook(Piece):
     def init(self):
         self.piece_name = 'rook'
 
-    def _moves(self, board):
+    def _moves(self, board, visible):
         moves = []
 
         for x in range(self.x + 1, 8):
-            if board[x][self.y] and board[x][self.y].c == self.c:
+            if board[x][self.y] and (x, self.y) in visible:
+                if board[x][self.y].c != self.c:
+                    moves.append((x, self.y))    
                 break
             else:
                 moves.append((x, self.y))
 
         for x in range(self.x - 1, -1, -1):
-            if board[x][self.y] and board[x][self.y].c == self.c:
+            if board[x][self.y] and (x, self.y) in visible:
+                if board[x][self.y].c != self.c:
+                    moves.append((x, self.y))    
                 break
             else:
                 moves.append((x, self.y))
 
         for y in range(self.y + 1, 8):
-            if board[self.x][y] and board[self.x][y].c == self.c:
+            if board[self.x][y] and (self.x, y) in visible:
+                if board[self.x][y].c != self.c:
+                    moves.append((self.x, y))    
                 break
             else:
                 moves.append((self.x, y))
 
         for y in range(self.y - 1, -1, -1):
-            if board[self.x][y] and board[self.x][y].c == self.c:
+            if board[self.x][y] and (self.x, y) in visible:
+                if board[self.x][y].c != self.c:
+                    moves.append((self.x, y))    
                 break
             else:
                 moves.append((self.x, y))
@@ -212,7 +225,7 @@ class Knight(Piece):
     def init(self):
         self.piece_name = 'knight'
 
-    def _moves(self, board):
+    def _moves(self, board, visible):
         moves = []
         x, y = self.pos
 
@@ -231,37 +244,46 @@ class Bishop(Piece):
     def init(self):
         self.piece_name = 'bishop'
 
-    def _moves(self, board):
+    def _moves(self, board, visible):
         moves = []
         x, y = self.x, self.y
 
         # TR for white, BR for black
         for i in range(1, min(7 - x, 7 - y) + 1):
-            if board[x + i][y + i] and board[x + i][y + i].c == self.c:
+            if board[x + i][y + i] and (x + i, y + i) in visible:
+                if board[x + i][y + i].c != self.c:
+                    moves.append((x + i, y + i))
                 break
             else:
                 moves.append((x + i, y + i))
 
         # TL for white, BL for black
         for i in range(1, min(x, 7 - y) + 1):
-            if board[x - i][y + i] and board[x - i][y + i].c == self.c:
+            if board[x - i][y + i] and (x - i, y + i) in visible:
+                if board[x - i][y + i].c != self.c:
+                    moves.append((x - i, y + i))
                 break
             else:
                 moves.append((x - i, y + i))
 
         # BL for white, TL for black
         for i in range(1, min(x, y) + 1):
-            if board[x - i][y - i] and board[x - i][y - i].c == self.c:
+            if board[x - i][y - i] and (x - i, y - i) in visible:
+                if board[x - i][y - i].c != self.c:
+                    moves.append((x - i, y - i))
                 break
             else:
                 moves.append((x - i, y - i))
 
         # BR for white, TR for black
         for i in range(1, min(7 - x, y) + 1):
-            if board[x + i][y - i] and board[x + i][y - i].c == self.c:
+            if board[x + i][y - i] and (x + i, y - i) in visible:
+                if board[x + i][y - i].c != self.c:
+                    moves.append((x + i, y - i))
                 break
             else:
                 moves.append((x + i, y - i))
+
 
         return moves
 
