@@ -103,6 +103,8 @@ class Piece:
             self.y = (7 - new_y)
         self.moved = True
 
+        return True
+
     def _move(self, board, x, y):
         target_piece = board.board[x][y]
         if target_piece:
@@ -133,7 +135,7 @@ class Pawn(Piece):
         if board[self.x][self.y + 1] == None:
             moves.append((self.x, self.y + 1))
 
-            if not self.moved and board[self.x][self.y + 2] == None:
+            if not self.moved and ((board[self.x][self.y + 2] == None) or ((self.x, self.y + 2) not in visible)):
                 moves.append((self.x, self.y + 2))
 
         # Forward-left
@@ -149,6 +151,27 @@ class Pawn(Piece):
                 moves.append((self.x + 1, self.y + 1))
 
         return moves
+
+    def _move(self, board, x, y):
+        old_x, old_y = self.pos
+        if abs(old_y - y > 1):
+            if board.board[x][y]:
+                if self.colour:
+                    y -= 1
+                else:
+                    y += 1
+                    
+        target_piece = board.board[x][y]
+        if target_piece:
+            board.captured.append(target_piece)
+            board.pieces.remove(target_piece)
+
+        old_x, old_y = self.pos
+        board.board[old_x][old_y] = None
+        board.board[x][y] = self
+
+        return (x, y)
+
 
 class Rook(Piece):
     def init(self):
@@ -354,13 +377,36 @@ class King(Piece):
             for y in range(-1, 2):
                 if not (0 <= self.x + x < 8):
                     continue
-                elif self.c and not (0 < self.y + y <= 8):
+                elif self.c and not (0 <= self.y + y < 8):
                     continue
-                elif not (0 < 7 - (self.y + y) <= 8):
+                elif not (0 <= 7 - (self.y + y) < 8):
                     continue
-                elif board[x + self.x][y + self.y] and board[x + self.x][y + self.y].c == self.c:
+                elif board[x + self.x][y + self.y] and (board[x + self.x][y + self.y].c == self.c):
                     continue
 
                 moves.append((self.x + x, self.y + y))
 
         return moves
+
+    def move(self, board, x, y):
+        if board.legal_king_move(self, x, y):
+            return False
+        else:
+            target_piece = board.board[x][y]
+            if target_piece:
+                board.captured.append(target_piece)
+                board.pieces.remove(target_piece)
+
+            old_x, old_y = self.pos
+            board.board[old_x][old_y] = None
+            board.board[x][y] = self
+
+            self.x = x
+            if self.c:
+                self.y = y
+            else:
+                self.y = (7 - y)
+            self.moved = True
+
+            return True
+ 

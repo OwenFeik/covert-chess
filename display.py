@@ -59,6 +59,10 @@ class Display():
             x, y = self.board.active_piece.draw_pos
             self.fill_tile('board_active_piece', x, y, 128)
 
+        if self.board.feedback_tile:
+            x, y = self.board.feedback_tile
+            self.fill_tile('board_checked', x, 7 - y, 128)
+
         king = self.board.checked(player)
         if king:
             x, y = king.draw_pos
@@ -68,6 +72,17 @@ class Display():
             if piece.draw_pos in visible:
                 x, y = piece.draw_pos
                 self.surface.blit(self.sprites[piece.sprite_name], ((x * self.tile_size) + self.tile_size * 0.1, y * self.tile_size + self.tile_size * 0.1))
+
+    def draw_all_tiles(self):
+        # Grey out the board, so pieces can be seen
+        grey = pygame.Surface((self.tile_size * 8, self.tile_size * 8))
+        grey.set_alpha(128)
+        grey.fill((100, 100, 100))        
+        self.surface.blit(grey, (0, 0))
+
+        for piece in self.board.pieces:
+            x, y = piece.draw_pos
+            self.surface.blit(self.sprites[piece.sprite_name], ((x * self.tile_size) + self.tile_size * 0.1, y * self.tile_size + self.tile_size * 0.1))
 
     def fill_tile(self, colour, x, y, alpha = 255):
         if type(colour) == str:
