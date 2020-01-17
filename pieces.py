@@ -349,7 +349,7 @@ class Queen(Piece):
         moves = self.rook._moves(board, visible)
         moves.extend(self.bishop._moves(board, visible))
 
-        return moves
+        return list(set(moves))
 
     def _move(self, board, x, y):
         old_x, old_y = self.pos

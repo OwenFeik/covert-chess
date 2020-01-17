@@ -4,9 +4,10 @@ with contextlib.redirect_stdout(None):
 import display
 import board
 
-player = False
+player = True
 
 b = board.Board(player).set_up()
+
 d = display.Display(b)
 d.redraw(player)
 
@@ -23,7 +24,7 @@ while game_running:
             d.handle_click(x, y)
             redraw = True
     if redraw:
-        d.redraw(player)
+        d.redraw(b.player)
         redraw = False
 
 pygame.quit()
