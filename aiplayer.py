@@ -1,4 +1,4 @@
-import copy
+import random
 import math
 
 class AIPlayer():
@@ -7,50 +7,39 @@ class AIPlayer():
         'rook': 5,
         'knight': 3,
         'bishop': 3,
-        'queen': 9
+        'queen': 9,
+        'king': 2
     }
 
-    def __init__(self, colour = False, depth = 1):
+    def __init__(self, colour = False):
         self.colour = colour
-        self.depth = depth
-        self.visible = None
-
+        self.visible = {}
+    
     def get_move(self, board):
         self.visible = board.visible(self.colour)
-        return self.minimax(board, depth = self.depth, turn = self.colour)
 
-    def minimax(self, board, depth, turn = None):
-        if turn is None:
-            turn = self.colour
+        value = self.evaluate_board(board)
+        best_move_value = -1 * math.inf
+        best_move = []
 
-        values = {}
-
-        for piece in [p for p in board.pieces if p.colour == turn]:
+        for piece in [p for p in board.pieces if p.colour == self.colour]:
             for move in piece.moves(board):
-                x, y = piece.pos
-                move_board = copy.deepcopy(board)
-                move_board.board[x][y].move(move_board, *move)
-                if depth == 0:
-                    values[(x, y, *move)] = self.evaluate_board(move_board) 
-                else:
-                    values[(x, y, *move)] = self.minimax(move_board, depth - 1, not turn)
+                x, y = move
+                target = board.board[x][y]
+                move_value = value
+                if target:
+                    move_value += self.piece_value(target.piece_name, target.y)
+                    move_value -= self.piece_value(piece.piece_name, piece.y)
+                    move_value += self.piece_value(piece.piece_name, (7 - y if not self.colour else y))
 
-        if turn == self.colour:
-            best_val = math.inf * -1
-            best_move = None
-            for move in values:
-                if values[move] > best_val:
-                    best_val = values[move]
-                    best_move = move
-        
-            return best_move if depth == self.depth else best_val
-        else:
-            worst_val = math.inf
-            for move in values:
-                if values[move] > worst_val:
-                    worst_val = values[move]
+                if move_value > best_move_value:
+                    best_move = [(piece, move)]
+                    best_move_value = move_value
+                elif move_value == best_move_value:
+                    best_move.append((piece, move))
+                    best_move_value = move_value
 
-            return worst_val
+        return random.choice(best_move)
 
     def evaluate_board(self, board):
         value = 0
@@ -58,10 +47,13 @@ class AIPlayer():
         multiplier = lambda p: (1 if p.colour == self.colour else -1)
 
         for piece in board.pieces:
-            if (piece.colour == self.colour or piece.pos in self.visible) and not piece.piece_name == 'king':
-                value += (self.piece_values[piece.piece_name] + (0.1 * piece.y)) * multiplier(piece)
+            if piece.pos in self.visible:
+                value += self.piece_value(piece.piece_name, piece.y) * multiplier(piece)
 
         for piece in board.captured:
             value += self.piece_values[piece.piece_name] * multiplier(piece) * -1
 
         return value
+
+    def piece_value(self, name, y):
+        return self.piece_values[name] + (0.1 * y)

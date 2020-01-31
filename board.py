@@ -1,4 +1,5 @@
 import pieces
+import aiplayer
 
 class Board:
     def __init__(self, player = True):
@@ -9,6 +10,8 @@ class Board:
         self.captured = []
         self.player = player
         self.winner = None
+
+        self.ai = aiplayer.AIPlayer(not player)
 
         # Cache results of expensive operations
         self.cache = {}
@@ -194,9 +197,11 @@ class Board:
             success = self.active_piece.move(self, x, y)
             if success:
                 self.active_piece = None
-                self.player = not self.player
                 self.recalc()
                 self.check_gameover()
+
+                piece, move = self.ai.get_move(self)
+                success = piece.move(self, *move)
             else:
                 self.feedback_tile = (x, y)
         elif self.board[x][y]:

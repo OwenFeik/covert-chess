@@ -25,6 +25,8 @@ class Display():
         self.sprites = loaders.Spritesheet.get_pieces(int(self.tile_size * 0.8))
 
     def redraw(self, colour = True):
+        #TODO show captured pieces (on the sides?)
+
         self.surface.blit(self.board_base, (0, 0))
 
         if self.board.winner is not None:
