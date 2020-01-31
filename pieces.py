@@ -234,6 +234,8 @@ class Rook(Piece):
             else:
                 _y = y
             _x = old_x
+        else:
+            _x, _y = old_x, old_y
 
         target_piece = board.board[_x][_y]
         if target_piece:

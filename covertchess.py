@@ -4,12 +4,18 @@ with contextlib.redirect_stdout(None):
 import display
 import board
 
+import aiplayer
+
 player = True
+
+ai = aiplayer.AIPlayer(not player)
 
 b = board.Board(player).set_up()
 
 d = display.Display(b)
 d.redraw(player)
+
+print(ai.get_move(b))
 
 game_running = True
 redraw = False

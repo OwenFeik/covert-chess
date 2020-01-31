@@ -129,6 +129,9 @@ class Board:
             self.winner = None
 
     def checkmate(self, colour):
+        #TODO: allow source of checking to be removed
+        # rather than just ending game
+
         king = self.get_king(colour)
 
         if not king.pos in self.checked_tiles(colour):
