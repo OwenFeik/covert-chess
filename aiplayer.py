@@ -13,7 +13,7 @@ class AIPlayer():
 
     def __init__(self, colour = False):
         self.colour = colour
-        self.visible = {}
+        self.visible = set()
     
     def get_move(self, board):
         self.visible = board.visible(self.colour)
@@ -26,11 +26,15 @@ class AIPlayer():
             for move in piece.moves(board):
                 x, y = move
                 target = board.board[x][y]
+
                 move_value = value
-                if target:
+
+                if target and target.pos in self.visible:
                     move_value += self.piece_value(target.piece_name, target.y)
-                    move_value -= self.piece_value(piece.piece_name, piece.y)
-                    move_value += self.piece_value(piece.piece_name, (7 - y if not self.colour else y))
+                    if target.piece_name == 'king':
+                        move_value = math.inf
+                move_value -= self.piece_value(piece.piece_name, piece.y)
+                move_value += self.piece_value(piece.piece_name, (7 - y if not self.colour else y))
 
                 if move_value > best_move_value:
                     best_move = [(piece, move)]

@@ -139,7 +139,7 @@ class Pawn(Piece):
                 moves.append((self.x, self.y + 2))
 
         # Forward-left
-        if 1 < self.x: 
+        if 0 < self.x: 
             tile = board[self.x - 1][self.y + 1]
             if tile != None and tile.c != self.c:
                 moves.append((self.x - 1, self.y + 1))

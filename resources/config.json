@@ -1,4 +1,5 @@
 {
     "spritesheet": "resources/pieces.png",
-    "colours": "resources/colours.json"
+    "colours": "resources/colours.json",
+    "ai_move_delay": 1000
 }

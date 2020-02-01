@@ -102,61 +102,6 @@ class Board:
 
         return self.cache['moves'][colour]
 
-    def checked(self, colour):
-        king = self.get_king(colour) 
-        if king and (king.pos in self.known_checked_tiles(colour)):
-            return king
-        return None
-
-    def checked_tiles(self, colour):
-        enemies = [p for p in self.pieces if p.colour != colour] 
-        checked = [] 
-        for piece in enemies:
-            moves = piece.moves(self)
-            if piece.piece_name == 'pawn':
-                x, y = piece.pos
-                for move in [(x, y + 1), (x, y + 2), (x, y - 1), (x, y - 2)]:
-                    if move in moves:
-                        moves.remove(move)
-            checked.extend(moves)
-
-        return set(checked)
-
-
-    def check_gameover(self):
-        if self.checkmate(False):
-            self.winner = True
-        elif self.checkmate(True):
-            self.winner = False
-        else:
-            self.winner = None
-
-    def checkmate(self, colour):
-        #TODO: allow source of checking to be removed
-        # rather than just ending game
-
-        king = self.get_king(colour)
-
-        if not king.pos in self.checked_tiles(colour):
-            return False
-
-        old_x, old_y = king.pos
-        for m in king.moves(self):
-            x, y = m
-            target = self.board[x][y]
-            self.board[x][y] = king
-            self.board[old_x][old_y] = None
-
-            self.recalc()
-            result = (x, y) in self.checked_tiles(colour)
-
-            self.board[old_x][old_y] = king
-            self.board[x][y] = target
-
-            if not result:
-                return False
-        return True
-
     def legal_king_move(self, king, x, y):
         old_x, old_y = king.pos
         target = self.board[x][y]
@@ -185,23 +130,40 @@ class Board:
 
         return set(known_checked)
 
-
     def get_king(self, colour):
         for piece in self.pieces:
             if piece.piece_name == 'king' and piece.colour == colour:
                 return piece
 
+    def take_ai_move(self):
+        captured_count = len(self.captured)
+
+        piece, move = self.ai.get_move(self)
+        piece.move(self, *move)
+
+        if len(self.captured) > captured_count:
+            if self.captured[-1].piece_name == 'king':
+                self.winner = self.ai.colour
+                self.feedback_tile = piece.draw_pos
+
+        self.recalc()
+
     def handle_click(self, x, y):
         self.feedback_tile = None
         if self.active_piece and self.active_piece.can_move_to(self, x, y):
+            captured_count = len(self.captured)
             success = self.active_piece.move(self, x, y)
             if success:
-                self.active_piece = None
                 self.recalc()
-                self.check_gameover()
 
-                piece, move = self.ai.get_move(self)
-                success = piece.move(self, *move)
+                if len(self.captured) > captured_count:
+                    if self.captured[-1].piece_name == 'king':
+                        self.winner = self.player
+                        self.feedback_tile = self.active_piece.draw_pos
+                        return None
+
+                self.active_piece = None
+                return True
             else:
                 self.feedback_tile = (x, y)
         elif self.board[x][y]:

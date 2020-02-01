@@ -25,8 +25,6 @@ class Display():
         self.sprites = loaders.Spritesheet.get_pieces(int(self.tile_size * 0.8))
 
     def redraw(self, colour = True):
-        #TODO show captured pieces (on the sides?)
-
         self.surface.blit(self.board_base, (0, 0))
 
         if self.board.winner is not None:
@@ -70,11 +68,6 @@ class Display():
             x, y = self.board.feedback_tile
             self.fill_tile('board_checked', x, 7 - y, 128)
 
-        king = self.board.checked(player)
-        if king:
-            x, y = king.draw_pos
-            self.fill_tile('board_checked', x, y, 128)
-
         for piece in self.board.pieces:
             if piece.draw_pos in visible:
                 x, y = piece.draw_pos
@@ -88,7 +81,7 @@ class Display():
         self.surface.blit(grey, (0, 0))
 
         if self.board.winner is not None:
-            self.fill_tile(self.colours['board_checked'], *self.board.get_king(not self.board.winner).draw_pos)
+            self.fill_tile(self.colours['board_checked'], *self.board.feedback_tile)
 
         for piece in self.board.pieces:
             x, y = piece.draw_pos
@@ -115,4 +108,5 @@ class Display():
     def handle_click(self, x, y):
         tile = (x - self.x_border_size) // self.tile_size, (y - self.y_border_size) // self.tile_size
         if 0 <= tile[0] < 8 and 0 <= tile[1] < 8:
-            self.board.handle_click(tile[0], (7 - tile[1]))
+            return self.board.handle_click(tile[0], (7 - tile[1]))
+        return None
